@@ -71,6 +71,8 @@ run_build() {
 	cp -f build.config.py.example build.config.py
 	sed -i "" "s/ANDROID_SDK_TARGET\=[0-9]*\,/ANDROID_SDK_TARGET\=${ANDROID_SDK_TARGET}\,/g" build.config.py
 	sed -i "" "s/\, [0-9]*\, cmake_vars/\, ${ANDROID_NATIVE_API_LEVEL}\, cmake_vars/g" build.config.py
+	sed -i "" "s/ANDROID_GRADLE_PLUGIN_VERSION\=\'.*\'/ANDROID_GRADLE_PLUGIN_VERSION\=\'${ANDROID_GRADLE_PLUGIN_VERSION}\'/g" build.config.py
+	sed -i "" "s/GRADLE_VERSION\=\'.*\'/GRADLE_VERSION\=\'${GRADLE_VERSION}\'/g" build.config.py
 
 	if [[ -d $BUILD_DIR ]]; then
 		rm -fR $BUILD_DIR

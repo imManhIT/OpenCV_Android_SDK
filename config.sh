@@ -10,5 +10,9 @@ export ANDROID_SDK_ROOT=/Volumes/WORKS/Android/sdk
 ANDROID_NATIVE_API_LEVEL=26
 ANDROID_SDK_TARGET=30
 
+# set gradle version
+ANDROID_GRADLE_PLUGIN_VERSION='4.1.3'
+GRADLE_VERSION='6.5'
+
 # add extra modules
 EXTRA_MODULE_LIST=xfeatures2d
