@@ -2,3 +2,4 @@ opencv/
 opencv_contrib/
 build/
 build.config.py
+build_sdk.py

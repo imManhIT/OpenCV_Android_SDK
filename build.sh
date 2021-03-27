@@ -10,14 +10,8 @@ BUILD_DIR=${WORD_DIR}/build
 source ${WORD_DIR}/config.sh
 
 download_source() {
-	if [[ $1 == "" ]]; 
-	then
-		git clone https://github.com/opencv/opencv.git $SOURCE_DIR
-		git clone https://github.com/opencv/opencv_contrib.git $EXTRA_MODULE_SOURCE
-	else
-		git clone -b $1 --single-branch https://github.com/opencv/opencv.git $SOURCE_DIR
-		git clone -b $1 --single-branch https://github.com/opencv/opencv_contrib.git $EXTRA_MODULE_SOURCE
-	fi
+	git clone https://github.com/opencv/opencv.git $SOURCE_DIR
+	git clone https://github.com/opencv/opencv_contrib.git $EXTRA_MODULE_SOURCE
 }
 
 set_version() {
@@ -57,10 +51,11 @@ set_extra_module() {
 
 run_build() {
 
-	if [[ $1 == "" ]]; 
-	then
-		set_version "master"
-	else
+	if [[ ! -d $SOURCE_DIR ]]; then
+		download_source
+	fi
+
+	if [[ ! $1 == "" ]]; then
 		set_version $1
 	fi
 
@@ -69,14 +64,32 @@ run_build() {
 	cd $WORD_DIR
 
 	cp -f build.config.py.example build.config.py
-	sed -i "" "s/ANDROID_SDK_TARGET\=[0-9]*\,/ANDROID_SDK_TARGET\=${ANDROID_SDK_TARGET}\,/g" build.config.py
-	sed -i "" "s/\, [0-9]*\, cmake_vars/\, ${ANDROID_NATIVE_API_LEVEL}\, cmake_vars/g" build.config.py
-	sed -i "" "s/ANDROID_GRADLE_PLUGIN_VERSION\=\'.*\'\,/ANDROID_GRADLE_PLUGIN_VERSION\=\'${ANDROID_GRADLE_PLUGIN_VERSION}\'\,/g" build.config.py
-	sed -i "" "s/GRADLE_VERSION\=\'.*\'/GRADLE_VERSION\=\'${GRADLE_VERSION}\'/g" build.config.py
+	cp -f build_sdk.py.example build_sdk.py
 
-	# set cpu core number
-	sed -i "" "s/cmd \= \[self\.cmake_path\, \"-GNinja\"\]/cmd \= \[self\.cmake_path\, \"-GNinja\"\, \"-j${CPU_CORE_NUMBER}\"\]/g" ${SOURCE_DIR}/platforms/android/build_sdk.py
-	sed -i "" "s/\"-j[0-9]*\"/\"-j${CPU_CORE_NUMBER}\"/g" ${SOURCE_DIR}/platforms/android/build_sdk.py
+	if [[ ! $1 == "master" ]]; then
+		cp -f gradle-wrapper.properties ${SOURCE_DIR}/platforms/android/gradle-wrapper/gradle/wrapper/gradle-wrapper.properties
+	fi
+
+	case "$HOST_OS" in
+		macos)
+			sed -i "" "s/ANDROID_SDK_TARGET\=[0-9]*\,/ANDROID_SDK_TARGET\=${ANDROID_SDK_TARGET}\,/g" build.config.py
+			sed -i "" "s/\, [0-9]*\, cmake_vars/\, ${ANDROID_NATIVE_API_LEVEL}\, cmake_vars/g" build.config.py
+			sed -i "" "s/@GRADLE_PLUGIN@/${ANDROID_GRADLE_PLUGIN_VERSION}/g" build.config.py
+			sed -i "" "s/@GRADLE_VERSION@/${GRADLE_VERSION}/g" build.config.py
+			sed -i "" "s/@GRADLE_VERSION@/${GRADLE_VERSION}/g" ${SOURCE_DIR}/platforms/android/gradle-wrapper/gradle/wrapper/gradle-wrapper.properties
+			sed -i "" "s/\"-j[0-9]*\"/\"-j${CPU_CORE_NUMBER}\"/g" ${WORD_DIR}/build_sdk.py
+			;;
+		linux)
+			sed -i "s/ANDROID_SDK_TARGET\=[0-9]*\,/ANDROID_SDK_TARGET\=${ANDROID_SDK_TARGET}\,/g" build.config.py
+			sed -i "s/\, [0-9]*\, cmake_vars/\, ${ANDROID_NATIVE_API_LEVEL}\, cmake_vars/g" build.config.py
+			sed -i "s/@GRADLE_PLUGIN@/${ANDROID_GRADLE_PLUGIN_VERSION}/g" build.config.py
+			sed -i "s/@GRADLE_VERSION@/${GRADLE_VERSION}/g" build.config.py
+			sed -i "s/@GRADLE_VERSION@/${GRADLE_VERSION}/g" ${SOURCE_DIR}/platforms/android/gradle-wrapper/gradle/wrapper/gradle-wrapper.properties
+			sed -i "s/\"-j[0-9]*\"/\"-j${CPU_CORE_NUMBER}\"/g" ${WORD_DIR}/build_sdk.py
+			;;
+	esac
+
+	cp -f build_sdk.py ${SOURCE_DIR}/platforms/android/build_sdk.py
 
 	if [[ -d $BUILD_DIR ]]; then
 		rm -fR $BUILD_DIR
@@ -97,13 +110,12 @@ run_build() {
 
 case "$1" in
 	download)
-		# build.sh download [version]
-		# build.sh download 4.5.1
-		download_source $2
+		# ./build.sh download
+		download_source
 		;;
 	*)
-		# build.sh [version]
-		# build.sh 4.5.1
+		# ./build.sh [version]
+		# ./build.sh 4.5.1
 		run_build $1
 		;;
 	test)
