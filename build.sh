@@ -71,7 +71,7 @@ run_build() {
 	cp -f build.config.py.example build.config.py
 	sed -i "" "s/ANDROID_SDK_TARGET\=[0-9]*\,/ANDROID_SDK_TARGET\=${ANDROID_SDK_TARGET}\,/g" build.config.py
 	sed -i "" "s/\, [0-9]*\, cmake_vars/\, ${ANDROID_NATIVE_API_LEVEL}\, cmake_vars/g" build.config.py
-	sed -i "" "s/ANDROID_GRADLE_PLUGIN_VERSION\=\'.*\'/ANDROID_GRADLE_PLUGIN_VERSION\=\'${ANDROID_GRADLE_PLUGIN_VERSION}\'/g" build.config.py
+	sed -i "" "s/ANDROID_GRADLE_PLUGIN_VERSION\=\'.*\'\,/ANDROID_GRADLE_PLUGIN_VERSION\=\'${ANDROID_GRADLE_PLUGIN_VERSION}\'\,/g" build.config.py
 	sed -i "" "s/GRADLE_VERSION\=\'.*\'/GRADLE_VERSION\=\'${GRADLE_VERSION}\'/g" build.config.py
 
 	# set cpu core number
@@ -85,7 +85,7 @@ run_build() {
 	cd $BUILD_DIR
 
 	echo python "${SOURCE_DIR}/platforms/android/build_sdk.py" --debug_info --no_samples_build --extra_modules_path "${EXTRA_MODULE_SOURCE}/modules" --config "../build.config.py"
-	python "${SOURCE_DIR}/platforms/android/build_sdk.py" --debug_info --no_samples_build --extra_modules_path "${EXTRA_MODULE_SOURCE}/modules" --config "../build.config.py" >> build.log
+	python "${SOURCE_DIR}/platforms/android/build_sdk.py" --debug_info --no_samples_build --extra_modules_path "${EXTRA_MODULE_SOURCE}/modules" --config "../build.config.py"
 	
 }
 
