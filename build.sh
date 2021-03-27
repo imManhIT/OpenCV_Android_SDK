@@ -74,6 +74,10 @@ run_build() {
 	sed -i "" "s/ANDROID_GRADLE_PLUGIN_VERSION\=\'.*\'/ANDROID_GRADLE_PLUGIN_VERSION\=\'${ANDROID_GRADLE_PLUGIN_VERSION}\'/g" build.config.py
 	sed -i "" "s/GRADLE_VERSION\=\'.*\'/GRADLE_VERSION\=\'${GRADLE_VERSION}\'/g" build.config.py
 
+	# set cpu core number
+	sed -i "" "s/cmd \= \[self\.cmake_path\, \"-GNinja\"\]/cmd \= \[self\.cmake_path\, \"-j${CPU_CORE_NUMBER} -GNinja\"\]/g" ${SOURCE_DIR}/platforms/android/build_sdk.py
+	sed -i "" "s/\"-j[0-9]*\"/\"-j${CPU_CORE_NUMBER}\"/g" ${SOURCE_DIR}/platforms/android/build_sdk.py
+
 	if [[ -d $BUILD_DIR ]]; then
 		rm -fR $BUILD_DIR
 	fi
