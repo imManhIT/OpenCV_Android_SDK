@@ -75,7 +75,7 @@ run_build() {
 	sed -i "" "s/GRADLE_VERSION\=\'.*\'/GRADLE_VERSION\=\'${GRADLE_VERSION}\'/g" build.config.py
 
 	# set cpu core number
-	sed -i "" "s/cmd \= \[self\.cmake_path\, \"-GNinja\"\]/cmd \= \[self\.cmake_path\, \"-j${CPU_CORE_NUMBER} -GNinja\"\]/g" ${SOURCE_DIR}/platforms/android/build_sdk.py
+	sed -i "" "s/cmd \= \[self\.cmake_path\, \"-GNinja\"\]/cmd \= \[self\.cmake_path\, \"-GNinja\"\, \"-j${CPU_CORE_NUMBER}\"\]/g" ${SOURCE_DIR}/platforms/android/build_sdk.py
 	sed -i "" "s/\"-j[0-9]*\"/\"-j${CPU_CORE_NUMBER}\"/g" ${SOURCE_DIR}/platforms/android/build_sdk.py
 
 	if [[ -d $BUILD_DIR ]]; then
@@ -84,8 +84,14 @@ run_build() {
 	mkdir $BUILD_DIR
 	cd $BUILD_DIR
 
-	echo python "${SOURCE_DIR}/platforms/android/build_sdk.py" --debug_info --no_samples_build --extra_modules_path "${EXTRA_MODULE_SOURCE}/modules" --config "../build.config.py"
-	python "${SOURCE_DIR}/platforms/android/build_sdk.py" --debug_info --no_samples_build --extra_modules_path "${EXTRA_MODULE_SOURCE}/modules" --config "../build.config.py"
+	if [[ $DEBUG_INFO == "ON" ]]; 
+	then
+		echo python "${SOURCE_DIR}/platforms/android/build_sdk.py" --debug_info --no_samples_build --extra_modules_path "${EXTRA_MODULE_SOURCE}/modules" --config "../build.config.py"
+		python "${SOURCE_DIR}/platforms/android/build_sdk.py" --debug_info --no_samples_build --extra_modules_path "${EXTRA_MODULE_SOURCE}/modules" --config "../build.config.py"
+	else
+		echo python "${SOURCE_DIR}/platforms/android/build_sdk.py" --no_samples_build --extra_modules_path "${EXTRA_MODULE_SOURCE}/modules" --config "../build.config.py"
+		python "${SOURCE_DIR}/platforms/android/build_sdk.py" --no_samples_build --extra_modules_path "${EXTRA_MODULE_SOURCE}/modules" --config "../build.config.py"
+	fi
 	
 }
 
