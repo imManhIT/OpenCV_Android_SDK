@@ -19,4 +19,10 @@ This setup to build OpenCV Android SDK for Android 9 (28) and Android 10 (30) an
 ### Build OpenCV Android SDK:
 Edit config.sh file: set host_os, cpu core number, sdk & ndk path, gradle version, extra module
 
+Install config ccache: 
+
+`export USE_CCACHE=1`
+
+`ccache -M 50G`
+
 Then run `./build.sh` or `./build.sh [version]`
